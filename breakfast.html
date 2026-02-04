@@ -1,0 +1,95 @@
+<html>
+   <header>
+        <link rel="stylesheet" href="main.css"/>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+   </header>
+  <body>
+     <h1>Breakfast</h1>
+     <p>Win the mini game to continue!</p>
+     
+     <div id="game-container"></div>
+
+     <script>
+      let eggs = [];
+      let score = 0;
+      let basketWidth = 80;
+
+      function setup() {
+        // Attach the canvas to a container so it doesn't just float at the bottom
+        let canvas = createCanvas(400, 400);
+        canvas.parent('game-container');
+      }
+
+      function draw() {
+        background(255, 245, 225); // Soft breakfast yellow
+        
+        // Display Score
+        fill(50);
+        textSize(20);
+        text("Eggs Caught: " + score + " / 5", 20, 30);
+
+        // Draw Player (Frying Pan)
+        fill(100);
+        rect(mouseX - basketWidth/2, height - 30, basketWidth, 15, 5); 
+        fill(50);
+        rect(mouseX + basketWidth/2, height - 25, 40, 5); // Pan handle
+
+        // Spawn eggs randomly
+        if (frameCount % 60 == 0 && score < 5) {
+          eggs.push(new Egg());
+        }
+
+        // Handle eggs
+        for (let i = eggs.length - 1; i >= 0; i--) {
+          eggs[i].fall();
+          eggs[i].display();
+
+          // Check for catch
+          if (eggs[i].y > height - 40 && 
+              eggs[i].x > mouseX - basketWidth/2 && 
+              eggs[i].x < mouseX + basketWidth/2) {
+            eggs.splice(i, 1);
+            score++;
+          } 
+          // Remove if off screen
+          else if (eggs[i].y > height) {
+            eggs.splice(i, 1);
+          }
+        }
+
+        // Win Condition
+        if (score >= 5) {
+          fill(0, 150, 0);
+          textAlign(CENTER);
+          textSize(32);
+          text("Breakfast is Ready!", width/2, height/2);
+          
+          // Delay redirect slightly so user sees the message
+          setTimeout(() => {
+            window.location.href = "school.html";
+          }, 1000);
+          noLoop(); // Stop the game
+        }
+      }
+
+      class Egg {
+        constructor() {
+          this.x = random(20, width - 20);
+          this.y = -20;
+          this.speed = random(2, 5);
+        }
+        fall() {
+          this.y += this.speed;
+        }
+        display() {
+          fill(255);
+          noStroke();
+          ellipse(this.x, this.y, 20, 25); // White part
+          fill(255, 200, 0);
+          ellipse(this.x, this.y + 2, 10, 10); // Yolk part
+        }
+      }
+     </script>
+
+  </body>
+</html>
